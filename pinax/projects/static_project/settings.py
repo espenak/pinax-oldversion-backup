@@ -3,9 +3,7 @@
 
 import os.path
 import posixpath
-import pinax
 
-PINAX_ROOT = os.path.abspath(os.path.dirname(pinax.__file__))
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 DEBUG = True
@@ -71,7 +69,13 @@ STATIC_URL = "/site_media/static/"
 
 # Additional directories which hold static files
 STATICFILES_DIRS = [
-    os.path.join(PROJECT_ROOT, "media"),
+    os.path.join(PROJECT_ROOT, "static"),
+]
+
+STATICFILES_FINDERS = [
+    "staticfiles.finders.FileSystemFinder",
+    "staticfiles.finders.AppDirectoriesFinder",
+    "staticfiles.finders.LegacyAppDirectoriesFinder",
 ]
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
@@ -103,13 +107,13 @@ TEMPLATE_DIRS = [
 ]
 
 TEMPLATE_CONTEXT_PROCESSORS = [
-    "django.core.context_processors.auth",
+    "django.contrib.auth.context_processors.auth",
     "django.core.context_processors.debug",
     "django.core.context_processors.i18n",
     "django.core.context_processors.media",
     "django.core.context_processors.request",
     
-    "staticfiles.context_processors.static_url",
+    "staticfiles.context_processors.static",
     
     "pinax.core.context_processors.pinax_settings",
 ]

@@ -9,9 +9,12 @@ class AuthenticationBackend(ModelBackend):
     def authenticate(self, **credentials):
         lookup_params = {}
         if settings.ACCOUNT_EMAIL_AUTHENTICATION:
-            lookup_params["email"] = credentials["email"]
+            field, identity = "email__iexact", credentials.get("email")
         else:
-            lookup_params["username"] = credentials["username"]
+            field, identity = "username__iexact", credentials.get("username")
+        if identity is None:
+            return None
+        lookup_params[field] = identity
         try:
             user = User.objects.get(**lookup_params)
         except User.DoesNotExist:

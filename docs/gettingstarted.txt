@@ -1,4 +1,4 @@
-.. _ref-gettingstarted:
+.. _gettingstarted:
 
 ===============
 Getting started
@@ -85,7 +85,7 @@ Go ahead and install Pinax::
     
     Keep in mind the development version may not be 100% stable. If you are
     looking to help out with development you should read our
-    :ref:`contributing documentation <ref-contributing>`.
+    :ref:`development documentation <development>`.
 
 ``pip`` you say? pip_ is a tool bundled with virtualenv to install Python
 packages. It is super handy and it is used in Pinax extensively to handle
@@ -159,6 +159,4 @@ information can be found on `runserver in Django documentation`_.
 What's next?
 ============
 
-Look at our :doc:`customization <customization>` documentation to learn how you
-might customize your project. If you are ready to deploy your project check
-out the :doc:`deployment <deployment>` documentation.
+todo

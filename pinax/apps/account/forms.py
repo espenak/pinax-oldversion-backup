@@ -2,10 +2,9 @@ import re
 
 from django import forms
 from django.conf import settings
+from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _, ugettext
-from django.utils.encoding import smart_unicode
-from django.utils.hashcompat import sha_constructor
 from django.utils.http import int_to_base36
 
 from django.contrib import messages
@@ -14,16 +13,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.models import Site
 
-from pinax.core.utils import get_send_mail
-send_mail = get_send_mail()
-
 from emailconfirmation.models import EmailAddress
 from timezones.forms import TimeZoneField
 
 from pinax.apps.account.models import Account, PasswordReset
-from pinax.apps.account.models import OtherServiceInfo, other_service, update_other_services
-from pinax.apps.account.utils import user_display, perform_login
-
+from pinax.apps.account.utils import perform_login, change_password
 
 
 alnum_re = re.compile(r"^\w+$")
@@ -34,7 +28,6 @@ REQUIRED_EMAIL = getattr(settings, "ACCOUNT_REQUIRED_EMAIL", False)
 EMAIL_VERIFICATION = getattr(settings, "ACCOUNT_EMAIL_VERIFICATION", False)
 EMAIL_AUTHENTICATION = getattr(settings, "ACCOUNT_EMAIL_AUTHENTICATION", False)
 UNIQUE_EMAIL = getattr(settings, "ACCOUNT_UNIQUE_EMAIL", False)
-
 
 
 class GroupForm(forms.Form):
@@ -63,7 +56,7 @@ class LoginForm(GroupForm):
         ordering = []
         if EMAIL_AUTHENTICATION:
             self.fields["email"] = forms.EmailField(
-                label = ugettext("E-mail"),
+                label = ugettext("Email"),
             )
             ordering.append("email")
         else:
@@ -99,7 +92,7 @@ class LoginForm(GroupForm):
                 raise forms.ValidationError(_("This account is currently inactive."))
         else:
             if EMAIL_AUTHENTICATION:
-                error = _("The e-mail address and/or password you specified are not correct.")
+                error = _("The email address and/or password you specified are not correct.")
             else:
                 error = _("The username and/or password you specified are not correct.")
             raise forms.ValidationError(error)
@@ -138,17 +131,17 @@ class SignupForm(GroupForm):
     def __init__(self, *args, **kwargs):
         super(SignupForm, self).__init__(*args, **kwargs)
         if REQUIRED_EMAIL or EMAIL_VERIFICATION or EMAIL_AUTHENTICATION:
-            self.fields["email"].label = ugettext("E-mail")
+            self.fields["email"].label = ugettext("Email")
             self.fields["email"].required = True
         else:
-            self.fields["email"].label = ugettext("E-mail (optional)")
+            self.fields["email"].label = ugettext("Email (optional)")
             self.fields["email"].required = False
     
     def clean_username(self):
         if not alnum_re.search(self.cleaned_data["username"]):
             raise forms.ValidationError(_("Usernames can only contain letters, numbers and underscores."))
         try:
-            user = User.objects.get(username__iexact=self.cleaned_data["username"])
+            User.objects.get(username__iexact=self.cleaned_data["username"])
         except User.DoesNotExist:
             return self.cleaned_data["username"]
         raise forms.ValidationError(_("This username is already taken. Please choose another."))
@@ -160,7 +153,7 @@ class SignupForm(GroupForm):
                 User.objects.get(email__iexact=value)
             except User.DoesNotExist:
                 return value
-            raise forms.ValidationError(_("A user is registered with this e-mail address."))
+            raise forms.ValidationError(_("A user is registered with this email address."))
         return value
     
     def clean(self):
@@ -192,7 +185,7 @@ class SignupForm(GroupForm):
     
     def save(self, request=None):
         # don't assume a username is available. it is a common removal if
-        # site developer wants to use e-mail authentication.
+        # site developer wants to use email authentication.
         username = self.cleaned_data.get("username")
         email = self.cleaned_data["email"]
         
@@ -214,7 +207,7 @@ class SignupForm(GroupForm):
                 join_invitation.accept(new_user) # should go before creation of EmailAddress below
                 if request:
                     messages.add_message(request, messages.INFO,
-                        ugettext(u"Your e-mail address has already been verified")
+                        ugettext(u"Your email address has already been verified")
                     )
                 # already verified so can just create
                 EmailAddress(user=new_user, email=email, verified=True, primary=True).save()
@@ -224,7 +217,7 @@ class SignupForm(GroupForm):
                 if email:
                     if request:
                         messages.add_message(request, messages.INFO,
-                            ugettext(u"Confirmation e-mail sent to %(email)s") % {
+                            ugettext(u"Confirmation email sent to %(email)s") % {
                                 "email": email,
                             }
                         )
@@ -234,7 +227,7 @@ class SignupForm(GroupForm):
             if email:
                 if request and not EMAIL_VERIFICATION:
                     messages.add_message(request, messages.INFO,
-                        ugettext(u"Confirmation e-mail sent to %(email)s") % {
+                        ugettext(u"Confirmation email sent to %(email)s") % {
                             "email": email,
                         }
                     )
@@ -293,7 +286,7 @@ class AccountForm(UserForm):
 class AddEmailForm(UserForm):
     
     email = forms.EmailField(
-        label = _("E-mail"),
+        label = _("Email"),
         required = True,
         widget = forms.TextInput(attrs={"size": "30"})
     )
@@ -301,8 +294,8 @@ class AddEmailForm(UserForm):
     def clean_email(self):
         value = self.cleaned_data["email"]
         errors = {
-            "this_account": _("This e-mail address already associated with this account."),
-            "different_account": _("This e-mail address already associated with another account."),
+            "this_account": _("This email address already associated with this account."),
+            "different_account": _("This email address already associated with another account."),
         }
         if UNIQUE_EMAIL:
             try:
@@ -350,8 +343,7 @@ class ChangePasswordForm(UserForm):
         return self.cleaned_data["password2"]
     
     def save(self):
-        self.user.set_password(self.cleaned_data["password1"])
-        self.user.save()
+        change_password(self.user, self.cleaned_data["password1"])
 
 
 class SetPasswordForm(UserForm):
@@ -379,14 +371,14 @@ class SetPasswordForm(UserForm):
 class ResetPasswordForm(forms.Form):
     
     email = forms.EmailField(
-        label = _("E-mail"),
+        label = _("Email"),
         required = True,
         widget = forms.TextInput(attrs={"size":"30"})
     )
     
     def clean_email(self):
         if EmailAddress.objects.filter(email__iexact=self.cleaned_data["email"], verified=True).count() == 0:
-            raise forms.ValidationError(_("E-mail address not verified for any user account"))
+            raise forms.ValidationError(_("Email address not verified for any user account"))
         return self.cleaned_data["email"]
     
     def save(self, **kwargs):
@@ -406,14 +398,14 @@ class ResetPasswordForm(forms.Form):
             domain = unicode(current_site.domain)
             
             # send the password reset email
-            subject = _("Password reset e-mail sent")
+            subject = _("Password reset email sent")
             message = render_to_string("account/password_reset_key_message.txt", {
                 "user": user,
                 "uid": int_to_base36(user.id),
                 "temp_key": temp_key,
                 "domain": domain,
             })
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email], priority="high")
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
         return self.cleaned_data["email"]
 
 
@@ -476,23 +468,3 @@ class ChangeLanguageForm(AccountForm):
     def save(self):
         self.account.language = self.cleaned_data["language"]
         self.account.save()
-
-
-class TwitterForm(UserForm):
-    username = forms.CharField(label=_("Username"), required=True)
-    password = forms.CharField(
-        label = _("Password"),
-        required = True,
-        widget = forms.PasswordInput(render_value=False)
-    )
-    
-    def __init__(self, *args, **kwargs):
-        super(TwitterForm, self).__init__(*args, **kwargs)
-        self.initial.update({"username": other_service(self.user, "twitter_user")})
-    
-    def save(self):
-        from microblogging.utils import get_twitter_password
-        update_other_services(self.user,
-            twitter_user = self.cleaned_data["username"],
-            twitter_password = get_twitter_password(settings.SECRET_KEY, self.cleaned_data["password"]),
-        )

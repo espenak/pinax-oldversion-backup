@@ -20,9 +20,7 @@ import pinax
 from pinax.core.management.base import BaseCommand, CommandError
 
 
-
 PROJECTS_DIR = os.path.join(os.path.dirname(pinax.__file__), "projects")
-
 
 
 class Command(BaseCommand):
@@ -108,7 +106,7 @@ class Command(BaseCommand):
             raise CommandError(
                 "'%s' conflicts with the name of an existing Python "
                 "package/module and cannot be used as a project name. Please "
-                "try another name." % project_name
+                "try another name." % user_project_name
             )
         
         # check the base value (we could later be much smarter about it and
@@ -209,7 +207,6 @@ class ProjectInstaller(object):
         pip.call_subprocess([
             pip_cmd,
             "install",
-            "--no-deps",
             "--requirement", requirements_file,
         ], show_stdout=True, extra_environ=environ)
 

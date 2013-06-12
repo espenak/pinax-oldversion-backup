@@ -1,15 +1,14 @@
 from django import template
-from django.conf import settings
+from django.utils.html import conditional_escape
 
 from pinax.apps.account.utils import user_display
-
 
 
 register = template.Library()
 
 
-
 class UserDisplayNode(template.Node):
+    
     def __init__(self, user, as_var=None):
         self.user_var = template.Variable(user)
         self.as_var = as_var
@@ -22,7 +21,7 @@ class UserDisplayNode(template.Node):
         if self.as_var:
             context[self.as_var] = display
             return ""
-        return display
+        return conditional_escape(display)
 
 
 @register.tag(name="user_display")

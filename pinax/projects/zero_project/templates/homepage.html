@@ -1,4 +1,4 @@
-{% extends "site_base.html" %}
+{% extends "banner_base.html" %}
 
 {% load i18n %}
 
@@ -6,10 +6,8 @@
 
 {% block body_class %}home{% endblock %}
 
-{% block body %}
-    
+{% block banner %}
     <h1>{% trans "Welcome to Pinax" %}</h1>
-    
     <p>
         {% blocktrans %}
         <b>Pinax</b> is a <a href="http://djangoproject.com/">Django</a>
@@ -20,15 +18,7 @@
         {% endblocktrans %}
     </p>
     
-    <p>
-        {% blocktrans %}
-        For more information about Pinax, see
-        <a href="http://pinaxproject.com/">http://pinaxproject.com/</a>.
-        {% endblocktrans %}
-    </p>
-    
-    <h2>{% trans "About this project" %}</h2>
-    
+    <h2>About Zero Project</h2>
     <p>
         {% blocktrans %}
         This project lays the foundation for all other Pinax starter projects. It
@@ -37,4 +27,5 @@
         {% endblocktrans %}
     </p>
     
+    <p><a href="http://pinaxproject.com/" class="btn primary large">{% trans "Learn more &raquo;" %}</a></p>
 {% endblock %}

@@ -1,17 +1,16 @@
 from django.conf import settings
-from django.http import HttpResponseRedirect, Http404
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.translation import ugettext
-from django.core.exceptions import ObjectDoesNotExist
 
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 
 from pinax.apps.account.utils import get_default_redirect, user_display
-from pinax.apps.signup_codes.models import check_signup_code
+from pinax.apps.signup_codes.models import SignupCode
 from pinax.apps.signup_codes.forms import SignupForm, InviteUserForm
-
 
 
 def group_and_bridge(request):
@@ -51,7 +50,14 @@ def signup(request, **kwargs):
     ctx = group_context(group, bridge)
     
     if success_url is None:
-        success_url = get_default_redirect(request)
+        if hasattr(settings, "SIGNUP_REDIRECT_URLNAME"):
+            fallback_url = reverse(settings.SIGNUP_REDIRECT_URLNAME)
+        else:
+            if hasattr(settings, "LOGIN_REDIRECT_URLNAME"):
+                fallback_url = reverse(settings.LOGIN_REDIRECT_URLNAME)
+            else:
+                fallback_url = settings.LOGIN_REDIRECT_URL
+        success_url = get_default_redirect(request, fallback_url)
     
     code = request.GET.get("code")
     
@@ -61,7 +67,8 @@ def signup(request, **kwargs):
             user = form.save(request=request)
             
             signup_code = form.cleaned_data["signup_code"]
-            signup_code.use(user)
+            if signup_code:
+                signup_code.use(user)
             
             form.login(request, user)
             messages.add_message(request, messages.SUCCESS,
@@ -71,9 +78,13 @@ def signup(request, **kwargs):
             )
             return HttpResponseRedirect(success_url)
     else:
-        signup_code = check_signup_code(code)
+        signup_code = SignupCode.check(code)
         if signup_code:
-            form = form_class(initial={"signup_code": code}, group=group)
+            initial = {
+                "signup_code": code,
+                "email": signup_code.email,
+            }
+            form = form_class(initial=initial, group=group)
         else:
             if not settings.ACCOUNT_OPEN_SIGNUP:
                 ctx.update({
@@ -110,7 +121,7 @@ def admin_invite_user(request, **kwargs):
             email = form.cleaned_data["email"]
             form.send_signup_code()
             messages.add_message(request, messages.INFO,
-                ugettext("An e-mail has been sent to %(email)s.") % {
+                ugettext("An email has been sent to %(email)s.") % {
                     "email": email
                 }
             )

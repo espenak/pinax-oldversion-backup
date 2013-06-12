@@ -1,6 +1,5 @@
+import datetime
 import os
-
-from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -13,15 +12,13 @@ import signup_codes
 from signup_codes.models import SignupCode
 
 
-
-
 class InviteUserTest(TestCase):
     
     urls = "signup_codes.tests.signup_codes_urls"
     
     def setUp(self):
         self.old_installed_apps = settings.INSTALLED_APPS
-        # remove django-mailer to properly test for outbound e-mail
+        # remove django-mailer to properly test for outbound email
         if "mailer" in settings.INSTALLED_APPS:
             settings.INSTALLED_APPS.remove("mailer")
         
@@ -75,7 +72,7 @@ class InviteUserTest(TestCase):
         data = {"email":"bob@example.com"}
         response = self.client.post(reverse("admin_invite_user"), data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "An e-mail has been sent to " + data["email"])
+        self.assertContains(response, "An email has been sent to " + data["email"])
     
     def test_accept_invite(self):
         """
@@ -85,7 +82,7 @@ class InviteUserTest(TestCase):
         #print help(self)
         # Create an invitation
         email = "joe@example.com"
-        expiry = datetime.now() + timedelta(hours=1)
+        expiry = datetime.datetime.now() + datetime.timedelta(hours=1)
         code = sha_constructor("%s%s%s%s" % (
             settings.SECRET_KEY,
             email,

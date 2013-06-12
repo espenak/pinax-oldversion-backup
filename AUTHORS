@@ -5,6 +5,8 @@ The PRIMARY AUTHORS are (and/or have been):
     * James Tauber
     * Brian Rosner
     * Jannis Leidel
+    * Patrick Altman
+    * Luke Hatcher
     * Danny Greenfeld
     * Martin Mahner
     * Greg Newman
@@ -37,7 +39,6 @@ ADDITIONAL CONTRIBUTORS include:
     * Sebastian Hillig
     * Markus Zapke-Gründemann
     * Curt Micol
-    * Luke Hatcher
     * Mikkel Høgh
     * Skylar Saveland
     * Manuel Meyer
@@ -62,10 +63,7 @@ ADDITIONAL CONTRIBUTORS include:
     * Richard House
     * Matthew Jacobi
     * Tom Brander
-    * Patrick Altman
-
-Pinax includes the following:
-
-    * Silk icon set 1.3 by Mark James http://www.famfamfam.com/lab/icons/silk/
-    * The uni-form css/js forms library by Dragan Babić http://sprawsm.com/uni-form/
-
+    * Donald Stufft
+    * Bojan Mihelac
+    * winhamwr
+    * Issac Kelly

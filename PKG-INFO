@@ -1,63 +1,91 @@
 Metadata-Version: 1.0
 Name: Pinax
-Version: 0.9a1
+Version: 0.9a2
 Summary: Pinax is an open-source collection of re-usable apps for the Django Web Framework
 Home-page: http://pinaxproject.com/
-Author: Jannis Leidel
-Author-email: jannis@leidel.info
+Author: Brian Rosner
+Author-email: brosner@gmail.com
 License: UNKNOWN
-Description: Introduction
+Download-URL: http://pinaxproject.com/downloads/
+Description: .. _intro:
+        
+        Introduction
         ============
         
-        Pinax is an open-source platform built on the `Django Web Framework`_.
+        Pinax is an MIT-licensed, open-source platform built on the Django Web
+        Framework.
         
-        By integrating numerous reusable Django apps to take care of the things
-        that many sites have in common, it lets you focus on what makes your
-        site different.
+        By integrating numerous reusable Django apps and providing starter projects
+        and infrastructure tools, Pinax takes care of the things that many sites
+        have in common so you can focus on what makes your site different.
         
-        While our initial development was focused around a demo social
-        networking site, Pinax is suitable for a wide variety of websites. We
-        are working on number of editions tailored to intranets, event
-        management, learning management, software project management and more.
+        Pinax has been used for everything from social networks to corporate websites
+        and from intranets to online games. We are also working on number of editions
+        tailored to event management, learning management, software project management
+        and more.
         
-        Features
-        --------
         
-        At this stage, there is:
+        .. _philosphy:
         
-        - openid support
-        - e-mail verification
-        - password management
-        - site announcements
-        - a notification framework
-        - user-to-user messaging
-        - friend invitation (both internal and external to the site)
-        - a basic twitter clone
-        - oembed support
-        - gravatar support
-        - interest groups (called tribes)
-        - projects with basic task and issue management
-        - threaded discussions
-        - wikis with multiple markup support
-        - blogging
-        - bookmarks
-        - tagging
-        - contact import (from vCard, Google or Yahoo)
-        - photo management
+        Philosphy
+        ---------
         
-        and much more coming...
+        todo (not sure if this deserves its own section)
         
-        History and Background
-        ----------------------
         
-        You can learn more about the history and motivation for Pinax in an
-        `interview with James Tauber on This Week in Django`_ as well as his
-        `talk on Pinax at DjangoCon 2008`_ and `talk on Pinax at PyCon 2009`_.
+        .. _license:
         
-        .. _`Django Web Framework`: http://djangoproject.com/
-        .. _`interview with James Tauber on This Week in Django`: http://thisweekindjango.com/twid/episode/24/this-week-in-django-24/
-        .. _`talk on Pinax at DjangoCon 2008`: http://www.youtube.com/watch?v=1J91Ownq-7g
-        .. _`talk on Pinax at PyCon 2009`: http://pycon.blip.tv/file/1952623/
+        Pinax License
+        -------------
+        
+        Copyright (c) 2008-2011 James Tauber and contributors.
+        
+        Permission is hereby granted, free of charge, to any person
+        obtaining a copy of this software and associated documentation
+        files (the "Software"), to deal in the Software without
+        restriction, including without limitation the rights to use,
+        copy, modify, merge, publish, distribute, sublicense, and/or sell
+        copies of the Software, and to permit persons to whom the
+        Software is furnished to do so, subject to the following
+        conditions:
+        
+        The above copyright notice and this permission notice shall be
+        included in all copies or substantial portions of the Software.
+        
+        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+        EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+        OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+        NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+        HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+        WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+        FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+        OTHER DEALINGS IN THE SOFTWARE.
+        
+        
+        .. _pythonsupport:
+        
+        Python Versions
+        ---------------
+        
+        At this time, the following Python platforms are officially supported:
+        
+         * cPython 2.4
+         * cPython 2.5
+         * cPython 2.6
+         * cPython 2.7
+        
+        
+        .. _djangosupport:
+        
+        Django Versions
+        ---------------
+        
+        At this time, the following Django versions are officially supported:
+        
+         * Django 1.2.X
+         * Django 1.3.X
+        
+        Pinax bundled starter projects install **Django 1.3**.
         
 Platform: UNKNOWN
 Classifier: Development Status :: 4 - Beta
